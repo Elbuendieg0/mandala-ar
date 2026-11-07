@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mandala AR</title>
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+  <style>
+    html, body { margin: 0; height: 100%; overflow: hidden; background: #14152a; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+    [hidden] { display: none !important; }
+    #intro { position: fixed; inset: 0; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 18px; padding: 24px; text-align: center; color: #ecebf7; background: radial-gradient(circle at 50% 35%, #2a2d5c, #14152a 70%); }
+    #intro h1 { margin: 0; font-size: 32px; }
+    #intro p { margin: 0; max-width: 34ch; line-height: 1.5; color: #c4c4de; }
+    #start { font: inherit; font-size: 18px; font-weight: 700; padding: 14px 28px; border: 0; border-radius: 999px;
+      background: #f1b53c; color: #1a1a2e; cursor: pointer; }
+    #intro a { color: #c8d0ff; font-size: 14px; }
+    #tip { position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; padding: 14px 16px calc(14px + env(safe-area-inset-bottom));
+      text-align: center; color: #fff; background: rgba(20, 21, 42, .75); font-size: 15px; }
+  </style>
+</head>
+<body>
+  <div id="intro">
+    <h1>Mandala AR</h1>
+    <p>Apunta la cámara al mandala terminado y el video aparecerá dentro del círculo.</p>
+    <button id="start" type="button">Activar cámara</button>
+    <a href="mandala-terminado.png" target="_blank">¿No tienes el mandala a mano? Ábrelo en otra pantalla</a>
+  </div>
+  <div id="tip" hidden>Busca el mandala con la cámara…</div>
+
+  <a-scene id="scene"
+    mindar-image="imageTargetSrc: ./targets.mind; autoStart: false; uiScanning: no; filterMinCF: 0.0001; filterBeta: 0.001"
+    color-space="sRGB" renderer="colorManagement: true" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+    <a-assets>
+      <video id="vid" src="video.mp4" preload="auto" loop playsinline webkit-playsinline crossorigin="anonymous"></video>
+    </a-assets>
+    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+    <a-entity id="target" mindar-image-target="targetIndex: 0">
+      <!-- El círculo interior del mandala mide 0.37 del ancho de la imagen -->
+      <a-circle id="screen" radius="0.37" segments="96" position="0 0 0.01" scale="0.001 0.001 0.001"
+        material="shader: flat; src: #vid"></a-circle>
+    </a-entity>
+  </a-scene>
+
+  <script>
+    const scene = document.getElementById('scene');
+    const vid = document.getElementById('vid');
+    const screen = document.getElementById('screen');
+    const target = document.getElementById('target');
+    const tip = document.getElementById('tip');
+
+    document.getElementById('start').addEventListener('click', async () => {
+      document.getElementById('intro').hidden = true;
+      tip.hidden = false;
+      // Desbloquea el audio del video con el toque del usuario (necesario en iPhone)
+      try { await vid.play(); vid.pause(); } catch (e) {}
+      if (!scene.hasLoaded) await new Promise(r => scene.addEventListener('loaded', r, { once: true }));
+      scene.systems['mindar-image-system'].start();
+    });
+
+    target.addEventListener('targetFound', () => {
+      tip.hidden = true;
+      vid.play();
+      screen.removeAttribute('animation');
+      screen.setAttribute('animation', 'property: scale; from: 0.001 0.001 0.001; to: 1 1 1; dur: 700; easing: easeOutBack');
+    });
+
+    target.addEventListener('targetLost', () => {
+      tip.hidden = false;
+      vid.pause();
+      screen.removeAttribute('animation');
+      screen.setAttribute('scale', '0.001 0.001 0.001');
+    });
+  </script>
+</body>
+</html>
