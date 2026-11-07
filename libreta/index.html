@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Libreta AR</title>
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.2.0/dist/aframe-extras.min.js"></script>
+  <script>
+    // Escala el modelo a una altura fija (en anchos del QR) y apoya los pies en el suelo
+    AFRAME.registerComponent('fit-height', {
+      schema: { type: 'number', default: 1.2 },
+      init() {
+        this.el.addEventListener('model-loaded', () => {
+          const obj = this.el.getObject3D('mesh');
+          const box = new THREE.Box3().setFromObject(obj);
+          const size = box.getSize(new THREE.Vector3());
+          const s = this.data / size.y;
+          obj.scale.setScalar(s);
+          const c = box.getCenter(new THREE.Vector3());
+          obj.position.set(-c.x * s, -box.min.y * s, -c.z * s);
+        });
+      }
+    });
+  </script>
+  <style>
+    html, body { margin: 0; height: 100%; overflow: hidden; background: #14152a; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+    [hidden] { display: none !important; }
+    #intro { position: fixed; inset: 0; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 18px; padding: 24px; text-align: center; color: #ecebf7; background: radial-gradient(circle at 50% 35%, #2a2d5c, #14152a 70%); }
+    #intro h1 { margin: 0; font-size: 32px; }
+    #intro p { margin: 0; max-width: 34ch; line-height: 1.5; color: #c4c4de; }
+    #start { font: inherit; font-size: 18px; font-weight: 700; padding: 14px 28px; border: 0; border-radius: 999px;
+      background: #f1b53c; color: #1a1a2e; cursor: pointer; }
+    #intro a { color: #c8d0ff; font-size: 14px; }
+    #tip { position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; padding: 14px 16px calc(14px + env(safe-area-inset-bottom));
+      text-align: center; color: #fff; background: rgba(20, 21, 42, .75); font-size: 15px; }
+  </style>
+</head>
+<body>
+  <div id="intro">
+    <h1>Libreta AR</h1>
+    <p>Apunta la cámara al código QR de la libreta. Alguien va a aparecer parado sobre la hoja.</p>
+    <button id="start" type="button">Activar cámara</button>
+    <a href="qr-libreta.png" target="_blank">¿No tienes la libreta a mano? Abre el QR en otra pantalla</a>
+  </div>
+  <div id="tip" hidden>Busca el código QR con la cámara…</div>
+
+  <a-scene id="scene"
+    mindar-image="imageTargetSrc: ./targets.mind; autoStart: false; uiScanning: no; filterMinCF: 0.0001; filterBeta: 0.001"
+    color-space="sRGB" renderer="colorManagement: true" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+    <a-assets>
+      <a-asset-item id="modelo" src="personaje.glb"></a-asset-item>
+    </a-assets>
+    <a-light type="ambient" intensity="0.9"></a-light>
+    <a-light type="directional" intensity="1.4" position="0.5 1 1"></a-light>
+    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+    <a-entity id="target" mindar-image-target="targetIndex: 0">
+      <!-- La hoja es el plano XY; el giro de 90° en X pone al personaje de pie sobre ella -->
+      <a-entity id="actor" rotation="90 0 0" scale="0.001 0.001 0.001">
+        <a-circle radius="0.28" rotation="-90 0 0" position="0 0.002 0"
+          material="shader: flat; color: #000; opacity: 0.35; transparent: true"></a-circle>
+        <a-entity id="personaje" gltf-model="#modelo" fit-height="1.2" animation-mixer="clip: Idle; loop: repeat"></a-entity>
+      </a-entity>
+    </a-entity>
+  </a-scene>
+
+  <script>
+    const scene = document.getElementById('scene');
+    const target = document.getElementById('target');
+    const actor = document.getElementById('actor');
+    const personaje = document.getElementById('personaje');
+    const tip = document.getElementById('tip');
+
+    document.getElementById('start').addEventListener('click', async () => {
+      document.getElementById('intro').hidden = true;
+      tip.hidden = false;
+      if (!scene.hasLoaded) await new Promise(r => scene.addEventListener('loaded', r, { once: true }));
+      scene.systems['mindar-image-system'].start();
+    });
+
+    // Al aparecer saluda una vez y luego se queda parado
+    personaje.addEventListener('animation-finished', () => {
+      personaje.setAttribute('animation-mixer', { clip: 'Idle', loop: 'repeat', crossFadeDuration: 0.3 });
+    });
+
+    target.addEventListener('targetFound', () => {
+      tip.hidden = true;
+      actor.removeAttribute('animation');
+      actor.setAttribute('animation', 'property: scale; from: 0.001 0.001 0.001; to: 1 1 1; dur: 700; easing: easeOutBack');
+      personaje.setAttribute('animation-mixer', { clip: 'Wave', loop: 'repeat', repetitions: 2, clampWhenFinished: false, crossFadeDuration: 0.3 });
+    });
+
+    target.addEventListener('targetLost', () => {
+      tip.hidden = false;
+      actor.removeAttribute('animation');
+      actor.setAttribute('scale', '0.001 0.001 0.001');
+    });
+  </script>
+</body>
+</html>

@@ -30,3 +30,15 @@ Si la imagen objetivo cambia (otro diseño, o un mandala pintado con otros color
 3. Reemplaza `targets.mind` y `mandala-terminado.png`.
 
 El reconocimiento compara contra esa imagen, así que funciona mejor cuando el mandala está pintado con la misma clave de colores.
+
+## Libreta AR (`/libreta/`)
+
+Un QR sencillo en blanco y negro para pegar en una libreta. Abre https://elbuendieg0.github.io/mandala-ar/libreta/ y, al apuntarle con la cámara, aparece un personaje 3D parado sobre la hoja que saluda y luego se queda quieto.
+
+| Archivo | Qué es |
+|---|---|
+| `libreta/qr-libreta.png` | El QR para imprimir |
+| `libreta/targets.mind` | El QR compilado como imagen objetivo |
+| `libreta/personaje.glb` | Personaje de prueba: RobotExpressive de Tomás Laulhé (CC0), de los ejemplos de three.js |
+
+Para usar otro personaje, reemplaza `personaje.glb`. La altura se ajusta sola con `fit-height` en `index.html` (1.2 = 1.2 veces el ancho del QR). Los nombres de las animaciones (`Wave`, `Idle`) deben coincidir con los del modelo nuevo.
