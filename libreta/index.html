@@ -14,7 +14,14 @@
       init() {
         this.el.addEventListener('model-loaded', () => {
           const obj = this.el.getObject3D('mesh');
-          const box = new THREE.Box3().setFromObject(obj);
+          // Se mide el modelo suelto: antes de detectar el QR, la escena padre tiene escala cero
+          const parent = obj.parent;
+          parent.remove(obj);
+          obj.scale.setScalar(1);
+          obj.position.set(0, 0, 0);
+          obj.updateMatrixWorld(true);
+          const box = new THREE.Box3().setFromObject(obj, true);
+          parent.add(obj);
           const size = box.getSize(new THREE.Vector3());
           const s = this.data / size.y;
           obj.scale.setScalar(s);
