@@ -69,7 +69,8 @@
     <button id="start" type="button">Activar cámara</button>
     <a href="qr-libreta.png" target="_blank">¿No tienes la libreta a mano? Abre el QR en otra pantalla</a>
   </div>
-  <div id="ver">v7</div>
+  <div id="ver">v8</div>
+  <audio id="musica" src="audio.m4a" preload="auto" playsinline></audio>
   <div id="tip" hidden>Busca el código QR con la cámara…</div>
 
   <a-scene id="scene"
@@ -98,10 +99,13 @@
     const actor = document.getElementById('actor');
     const personaje = document.getElementById('personaje');
     const tip = document.getElementById('tip');
+    const musica = document.getElementById('musica');
 
     document.getElementById('start').addEventListener('click', async () => {
       document.getElementById('intro').hidden = true;
       tip.hidden = false;
+      // Desbloquea el audio con el toque del usuario (necesario en iPhone)
+      try { await musica.play(); musica.pause(); musica.currentTime = 0; } catch (e) {}
       if (!scene.hasLoaded) await new Promise(r => scene.addEventListener('loaded', r, { once: true }));
       scene.systems['mindar-image-system'].start();
     });
@@ -111,6 +115,7 @@
       actor.removeAttribute('animation');
       actor.setAttribute('animation', 'property: scale; from: 0.001 0.001 0.001; to: 1 1 1; dur: 700; easing: easeOutBack');
       personaje.setAttribute('animation-mixer', 'timeScale', 1);
+      musica.play().catch(() => {});
     });
 
     target.addEventListener('targetLost', () => {
@@ -118,6 +123,7 @@
       actor.removeAttribute('animation');
       actor.setAttribute('scale', '0.001 0.001 0.001');
       personaje.setAttribute('animation-mixer', 'timeScale', 0);
+      musica.pause();
     });
   </script>
 </body>
