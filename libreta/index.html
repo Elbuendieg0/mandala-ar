@@ -30,6 +30,20 @@
         });
       }
     });
+
+    // Modelos sin colores (solo geometría): sombreado suave y acabado mate de figura
+    AFRAME.registerComponent('acabado', {
+      schema: { color: { default: '#d8b89a' } },
+      init() {
+        this.el.addEventListener('model-loaded', () => {
+          this.el.getObject3D('mesh').traverse(o => {
+            if (!o.isMesh || o.material.map || o.geometry.attributes.color) return;
+            if (!o.geometry.attributes.normal) o.geometry.computeVertexNormals();
+            o.material = new THREE.MeshStandardMaterial({ color: this.data.color, roughness: 0.75, metalness: 0.05 });
+          });
+        });
+      }
+    });
   </script>
   <style>
     html { background: #14152a; }
@@ -55,7 +69,7 @@
     <button id="start" type="button">Activar cámara</button>
     <a href="qr-libreta.png" target="_blank">¿No tienes la libreta a mano? Abre el QR en otra pantalla</a>
   </div>
-  <div id="ver">v3</div>
+  <div id="ver">v4</div>
   <div id="tip" hidden>Busca el código QR con la cámara…</div>
 
   <a-scene id="scene"
@@ -73,7 +87,7 @@
       <a-entity id="actor" rotation="90 0 0" scale="0.001 0.001 0.001">
         <a-circle radius="0.3" rotation="-90 0 0" position="0 0.002 0"
           material="shader: flat; color: #000; opacity: 0.35; transparent: true"></a-circle>
-        <a-entity id="personaje" gltf-model="#modelo" fit-height="1.5" animation-mixer="clip: Idle; loop: repeat"></a-entity>
+        <a-entity id="personaje" gltf-model="#modelo" fit-height="1.5" acabado animation-mixer="clip: Idle; loop: repeat"></a-entity>
       </a-entity>
     </a-entity>
   </a-scene>
