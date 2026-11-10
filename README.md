@@ -39,6 +39,6 @@ Un QR sencillo en blanco y negro para pegar en una libreta. Abre https://elbuend
 |---|---|
 | `libreta/qr-libreta.png` | El QR para imprimir |
 | `libreta/targets.mind` | El QR compilado como imagen objetivo |
-| `libreta/personaje.glb` | Modelo 3D personal, optimizado a 55 mil triángulos. No trae texturas: el componente `acabado` le da un color mate |
+| `libreta/personaje.glb` | Modelo 3D personal, optimizado a 55 mil triángulos, con colores proyectados desde la imagen de referencia (frente) y una espalda generada |
 
 Para usar otro personaje, reemplaza `personaje.glb`. La altura se ajusta sola con `fit-height` en `index.html` (1.5 = 1.5 veces el ancho del QR). Si el modelo trae animaciones llamadas `Wave` e `Idle`, saluda al aparecer y luego se queda quieto.
