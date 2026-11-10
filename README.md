@@ -33,12 +33,14 @@ El reconocimiento compara contra esa imagen, así que funciona mejor cuando el m
 
 ## Libreta AR (`/libreta/`)
 
-Un QR sencillo en blanco y negro para pegar en una libreta. Abre https://elbuendieg0.github.io/mandala-ar/libreta/ y, al apuntarle con la cámara, aparece un personaje 3D parado sobre la hoja, bailando.
+Un QR sencillo en blanco y negro para pegar en una libreta. Abre https://elbuendieg0.github.io/mandala-ar/libreta/ y, al apuntarle con la cámara, aparece un personaje 3D parado sobre la hoja, bailando samba.
 
 | Archivo | Qué es |
 |---|---|
 | `libreta/qr-libreta.png` | El QR para imprimir |
 | `libreta/targets.mind` | El QR compilado como imagen objetivo |
-| `libreta/personaje.glb` | Modelo 3D personal, optimizado a 55 mil triángulos, con colores proyectados desde la imagen de referencia (frente) y una espalda generada |
+| `libreta/personaje.glb` | Modelo 3D personal con esqueleto y baile de Mixamo (Samba Dancing, 28 s), 55 mil triángulos y textura JPG |
 
-Para usar otro personaje, reemplaza `personaje.glb`. La altura se ajusta sola con `fit-height` en `index.html` (1.5 = 1.5 veces el ancho del QR). El baile está en `libreta/bailar.js`: le pone un esqueleto al modelo (las articulaciones están medidas sobre la imagen de referencia, en pose A) y mueve los huesos con código. Para otro modelo hay que volver a medir las articulaciones.
+Para usar otro personaje, reemplaza `personaje.glb`. La altura se ajusta sola con `fit-height` en `index.html` (1.5 = 1.5 veces el ancho del QR). La animación se reproduce con `animation-mixer` (aframe-extras) y solo corre mientras la cámara ve el QR. Para cambiar de baile, descarga otro de Mixamo (FBX con piel) y conviértelo a GLB.
+
+`libreta/bailar.js` es una alternativa para modelos sin esqueleto: les pone uno en el navegador (articulaciones medidas sobre la imagen de referencia, en pose A) y los hace bailar con código. Ahora no se usa.

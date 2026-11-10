@@ -6,7 +6,7 @@
   <title>Libreta AR</title>
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
-  <script src="bailar.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.2.0/dist/aframe-extras.min.js"></script>
   <script>
     // Escala el modelo a una altura fija (en anchos del QR) y apoya los pies en el suelo
     AFRAME.registerComponent('fit-height', {
@@ -69,7 +69,7 @@
     <button id="start" type="button">Activar cámara</button>
     <a href="qr-libreta.png" target="_blank">¿No tienes la libreta a mano? Abre el QR en otra pantalla</a>
   </div>
-  <div id="ver">v6</div>
+  <div id="ver">v7</div>
   <div id="tip" hidden>Busca el código QR con la cámara…</div>
 
   <a-scene id="scene"
@@ -87,7 +87,7 @@
       <a-entity id="actor" rotation="90 0 0" scale="0.001 0.001 0.001">
         <a-circle radius="0.3" rotation="-90 0 0" position="0 0.002 0"
           material="shader: flat; color: #000; opacity: 0.35; transparent: true"></a-circle>
-        <a-entity id="personaje" gltf-model="#modelo" fit-height="1.5" acabado bailar></a-entity>
+        <a-entity id="personaje" gltf-model="#modelo" fit-height="1.5" animation-mixer="clip: *; loop: repeat; timeScale: 0"></a-entity>
       </a-entity>
     </a-entity>
   </a-scene>
@@ -110,14 +110,14 @@
       tip.hidden = true;
       actor.removeAttribute('animation');
       actor.setAttribute('animation', 'property: scale; from: 0.001 0.001 0.001; to: 1 1 1; dur: 700; easing: easeOutBack');
-      personaje.setAttribute('bailar', 'activo', true);
+      personaje.setAttribute('animation-mixer', 'timeScale', 1);
     });
 
     target.addEventListener('targetLost', () => {
       tip.hidden = false;
       actor.removeAttribute('animation');
       actor.setAttribute('scale', '0.001 0.001 0.001');
-      personaje.setAttribute('bailar', 'activo', false);
+      personaje.setAttribute('animation-mixer', 'timeScale', 0);
     });
   </script>
 </body>
