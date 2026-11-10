@@ -33,7 +33,7 @@ El reconocimiento compara contra esa imagen, así que funciona mejor cuando el m
 
 ## Libreta AR (`/libreta/`)
 
-Un QR sencillo en blanco y negro para pegar en una libreta. Abre https://elbuendieg0.github.io/mandala-ar/libreta/ y, al apuntarle con la cámara, aparece un personaje 3D parado sobre la hoja que saluda y luego se queda quieto.
+Un QR sencillo en blanco y negro para pegar en una libreta. Abre https://elbuendieg0.github.io/mandala-ar/libreta/ y, al apuntarle con la cámara, aparece un personaje 3D parado sobre la hoja, bailando.
 
 | Archivo | Qué es |
 |---|---|
@@ -41,4 +41,4 @@ Un QR sencillo en blanco y negro para pegar en una libreta. Abre https://elbuend
 | `libreta/targets.mind` | El QR compilado como imagen objetivo |
 | `libreta/personaje.glb` | Modelo 3D personal, optimizado a 55 mil triángulos, con colores proyectados desde la imagen de referencia (frente) y una espalda generada |
 
-Para usar otro personaje, reemplaza `personaje.glb`. La altura se ajusta sola con `fit-height` en `index.html` (1.5 = 1.5 veces el ancho del QR). Si el modelo trae animaciones llamadas `Wave` e `Idle`, saluda al aparecer y luego se queda quieto.
+Para usar otro personaje, reemplaza `personaje.glb`. La altura se ajusta sola con `fit-height` en `index.html` (1.5 = 1.5 veces el ancho del QR). El baile está en `libreta/bailar.js`: le pone un esqueleto al modelo (las articulaciones están medidas sobre la imagen de referencia, en pose A) y mueve los huesos con código. Para otro modelo hay que volver a medir las articulaciones.
